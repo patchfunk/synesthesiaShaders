@@ -1,6 +1,7 @@
 
 
-
+////////////////////////////////////////////////////////////
+// based on: https://editor.isf.video/shaders/5e7a80337c113618206decb5
 ////////////////////////////////////////////////////////////
 // AnotherSpheriodFractalThing  by mojovideotech
 //
@@ -15,7 +16,8 @@
 #define 	twpi  	6.283185307179586  	// two pi, 2*pi
 
 
-float t=TIME*rate;
+float t=syn_BassTime*rate;
+float tColor=sin(syn_HighTime)*0.5-2.0;
 
 vec2 B(vec2 a) { return vec2(log(length(a)),atan(a.y,a.x)-twpi); }
 
@@ -49,12 +51,11 @@ vec3 F(vec2 E, float G) {
 		c += length(e_);
 	}
 	float d = log2(log2(c*.25))*9.;
-	return vec3(.5+.75*cos(d),.3+.67*cos(d-TIME*cycle),.1+.95*cos(G));
+	return vec3(.5+.75*cos(d),.3+.67*cos(d-tColor*cycle),.1+.95*cos(G));
 }
 
 vec4 renderMain() { 
- 	vec4 out_FragColor = vec4(0.0);
-	
+
 	vec2 uv = _xy.xy / RENDERSIZE.xy;
 	float th =  uv.t * pi, ph = uv.s * twpi;
 	vec3 p = vec3(sin(th) * cos(ph),  sin(th) * sin(ph), cos(th));
@@ -65,9 +66,8 @@ vec4 renderMain() {
   	float saz = sin(RZ);
   	float caz = cos(RZ);
     vec3 H = vec3((cay * p.x + say * p.z)+(caz * p.x - saz * p.y),(cax * p.y - sax * p.z)+(saz * p.x + caz * p.y),(sax * p.y + cax * p.z)+(-say * p.x + cay * p.z));
-out_FragColor=vec4(spin(range*F(H.zx,H.y)),1.);
 
-return out_FragColor; 
+	return vec4(spin(range*F(H.zx,H.y)),1);
  } 
 
 
