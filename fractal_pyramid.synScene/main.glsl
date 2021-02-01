@@ -1,8 +1,12 @@
+// original author: https://www.shadertoy.com/view/tsXBzS
+// https://www.shadertoy.com/user/bradjamesgrant
+// License: Unknown
+
 vec4 iMouse = vec4(MouseXY*RENDERSIZE, MouseClick, MouseClick); 
 
 
 vec3 palette(float d){
-	return mix(vec3(0.2,0.7,0.9),vec3(1.,0.,1.),d);
+	return mix(vec3(0.2,0.7,0.9),vec3(1.,0.,1.),d*(1.0-syn_BassHits*0.2));
 }
 
 vec2 rotate(vec2 p,float a){
@@ -13,7 +17,7 @@ vec2 rotate(vec2 p,float a){
 
 float map(vec3 p){
     for( int i = 0; i<8; ++i){
-        float t = TIME*0.2;
+        float t = syn_BassTime*0.04 - syn_Time*0.003;
         p.xz =rotate(p.xz,t);
         p.xy =rotate(p.xy,t*1.89);
         p.xz = abs(p.xz);
@@ -46,7 +50,7 @@ vec4 renderMainImage() {
 
     vec2 uv = (fragCoord-(RENDERSIZE.xy/2.))/RENDERSIZE.x;
 	vec3 ro = vec3(0.,0.,-50.);
-    ro.xz = rotate(ro.xz,TIME);
+    ro.xz = rotate(ro.xz,syn_HighTime-syn_Time*0.03);
     vec3 cf = normalize(-ro);
     vec3 cs = normalize(cross(cf,vec3(0.,1.,0.)));
     vec3 cu = normalize(cross(cf,cs));
