@@ -2,11 +2,11 @@
 // https://www.shadertoy.com/user/bradjamesgrant
 // License: Unknown
 
-vec4 iMouse = vec4(MouseXY*RENDERSIZE, MouseClick, MouseClick); 
-
-
+float fold = syn_BassTime*bass_folding- syn_Time*0.003;
+float rotation = syn_HighTime*high_rotation + syn_BassTime*bass_rotation-syn_Time*0.03;
+float dyn_iterations = map_iterations+ bass_iterations*syn_BassLevel +randombeat_iterations*syn_RandomOnBeat;
 vec3 palette(float d){
-	return mix(vec3(0.2,0.7,0.9),vec3(1.,0.,1.),d*(1.0-syn_BassHits*0.2));
+	return mix(color1,color2,d*(1.0-syn_BassHits*0.2));
 }
 
 vec2 rotate(vec2 p,float a){
@@ -16,8 +16,8 @@ vec2 rotate(vec2 p,float a){
 }
 
 float map(vec3 p){
-    for( int i = 0; i<8; ++i){
-        float t = syn_BassTime*0.04 - syn_Time*0.003;
+    for( int i = 0; i<dyn_iterations; ++i){
+        float t = fold;
         p.xz =rotate(p.xz,t);
         p.xy =rotate(p.xy,t*1.89);
         p.xz = abs(p.xz);
@@ -50,12 +50,12 @@ vec4 renderMainImage() {
 
     vec2 uv = (fragCoord-(RENDERSIZE.xy/2.))/RENDERSIZE.x;
 	vec3 ro = vec3(0.,0.,-50.);
-    ro.xz = rotate(ro.xz,syn_HighTime-syn_Time*0.03);
+    ro.xz = rotate(ro.xz, rotation);
     vec3 cf = normalize(-ro);
     vec3 cs = normalize(cross(cf,vec3(0.,1.,0.)));
     vec3 cu = normalize(cross(cf,cs));
     
-    vec3 uuv = ro+cf*3. + uv.x*cs + uv.y*cu;
+    vec3 uuv = ro+cf*scale_factor + uv.x*cs + uv.y*cu;
     
     vec3 rd = normalize(uuv-ro);
     

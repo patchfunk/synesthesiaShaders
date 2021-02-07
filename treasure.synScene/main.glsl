@@ -1,5 +1,9 @@
 // source: https://www.shadertoy.com/view/3ltBD8
 
+float t = syn_Time*time_scroll - syn_BassTime*bass_scroll;
+float horizontal = (syn_BassTime - syn_HighTime)*0.01;
+float factor = 1.0/iterations;
+
 vec2 pmod(vec2 p,float n){
   float np = 2.*PI/n;
   float r = atan(p.x,p.y)-0.5*np;
@@ -38,10 +42,10 @@ vec4 dist(vec3 p,float t){
 
     float s =1.;
     p.z = abs(p.z)-3.;
-    p = abs(p)-s*8.;
-    p = abs(p)-s*4.;
-    p = abs(p)-s*2.;
-    p = abs(p)-s*1.;
+    p = abs(p)-s*(factor1+factor1_bass * syn_BassLevel);
+    p = abs(p)-s*(factor2+factor2_bass * syn_BassLevel);
+    p = abs(p)-s*(factor3+factor3_bass * syn_BassLevel);
+    p = abs(p)-s*(factor4+factor4_bass * syn_BassLevel);
 
     vec4 sd = tetcol(p,vec3(1),1.8,vec3(0.));
     float d= sd.w;
@@ -58,8 +62,8 @@ vec4 renderMainImage() {
     vec2 p = (uv-0.5)*2.;
     p.y *= RENDERSIZE.y/RENDERSIZE.x;
 
-    float rsa =0.1+mod(TIME*0.2,32.);
-    float rkt = TIME*0.+0.5*PI+1.05;
+    float rsa =0.1+mod(t*0.2,32.);
+    float rkt = horizontal +0.5*PI+1.05;
     vec3 of = vec3(0,0,0);
     vec3 ro = of+vec3(rsa*cos(rkt),-1.2,rsa*sin(rkt));
     vec3 ta = of+vec3(0,-1.3,0);
@@ -71,7 +75,7 @@ vec4 renderMainImage() {
     float d,t= 0.;
     vec3 ac = vec3(0.);
     float ep = 0.0001;
-    for(int i = 0;i<66;i++){
+    for(int i = 0;i<iterations;i++){
         vec4 rsd = dist(ro+rd*t,t);
         d = rsd.w;
         t += d;
@@ -79,7 +83,7 @@ vec4 renderMainImage() {
         if(d<ep) break;
     }
 
-    vec3 col = vec3(0.04*ac);
+    vec3 col = vec3(factor*ac);
 
     if(col.r<0.1&&(col.b<0.1&&col.g<0.1)) col =vec3(0.);
 	fragColor = vec4(col, 1.0 );
